@@ -39,6 +39,10 @@ public class PalomboCommons {
         MODULE_MANAGER = new ModuleManager(REFLECTIONS);
     }
 
+    public static void init() {
+
+    }
+
     public static void log(String message, Object ... args) {
         Logger.getLogger("palombo-commons").log(Level.INFO, String.format(message, args));
     }
