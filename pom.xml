@@ -6,7 +6,7 @@
 
     <groupId>me.colinpalombo</groupId>
     <artifactId>palombo-commons</artifactId>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
 
     <properties>
         <github.global.server>github</github.global.server>

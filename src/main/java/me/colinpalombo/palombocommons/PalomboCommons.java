@@ -19,10 +19,14 @@ public class PalomboCommons {
 
     private static final String PACKAGE_NAME = "me.colinpalombo.palombocommons";
 
-    public static final Reflections REFLECTIONS;
-    public static final ModuleManager MODULE_MANAGER;
+    private static Reflections REFLECTIONS;
+    private static ModuleManager MODULE_MANAGER;
 
     static {
+        init();
+    }
+
+    public static void init() {
         // Reflections
         URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{}, ClasspathHelper.staticClassLoader());
 
@@ -39,8 +43,20 @@ public class PalomboCommons {
         MODULE_MANAGER = new ModuleManager(REFLECTIONS);
     }
 
-    public static void init() {
+    public static Reflections getReflections() {
+        if (REFLECTIONS == null) {
+            init();
+        }
 
+        return REFLECTIONS;
+    }
+
+    public static ModuleManager getModuleManager() {
+        if (REFLECTIONS == null) {
+            init();
+        }
+
+        return MODULE_MANAGER;
     }
 
     public static void log(String message, Object ... args) {
