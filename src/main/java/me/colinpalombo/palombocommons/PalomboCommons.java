@@ -22,25 +22,28 @@ public class PalomboCommons {
     private static Reflections REFLECTIONS;
     private static ModuleManager MODULE_MANAGER;
 
-    static {
-        init();
+    public static void init(String packageName) {
+        // Reflections
+        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{}, ClasspathHelper.staticClassLoader());
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+            .addUrls(ClasspathHelper.forPackage(PACKAGE_NAME, classLoader))
+            .addClassLoader(classLoader)
+            .filterInputsBy(new FilterBuilder().includePackage(PACKAGE_NAME))
+            .setScanners(
+                    new SubTypesScanner(false),
+                    new TypeAnnotationsScanner()
+        );
+
+        if (packageName != null && !packageName.isEmpty()) {
+            configurationBuilder.addUrls(ClasspathHelper.forPackage(packageName, classLoader));
+        }
+
+        REFLECTIONS = new Reflections(configurationBuilder);
+        MODULE_MANAGER = new ModuleManager(REFLECTIONS);
     }
 
     public static void init() {
-        // Reflections
-        URLClassLoader classLoader = URLClassLoader.newInstance(new URL[]{}, ClasspathHelper.staticClassLoader());
-
-        REFLECTIONS = new Reflections(new ConfigurationBuilder()
-                .addUrls(ClasspathHelper.forPackage(PACKAGE_NAME, classLoader))
-                .addClassLoader(classLoader)
-                .filterInputsBy(new FilterBuilder().includePackage(PACKAGE_NAME))
-                .setScanners(
-                        new SubTypesScanner(false),
-                        new TypeAnnotationsScanner()
-                )
-        );
-
-        MODULE_MANAGER = new ModuleManager(REFLECTIONS);
+        init("");
     }
 
     public static Reflections getReflections() {
