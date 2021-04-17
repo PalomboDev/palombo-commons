@@ -4,6 +4,8 @@ import com.sun.org.apache.regexp.internal.RE;
 import lombok.Getter;
 import me.colinpalombo.palombocommons.module.ModuleManager;
 import org.reflections.Reflections;
+import org.reflections.scanners.FieldAnnotationsScanner;
+import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
@@ -19,8 +21,10 @@ public class PalomboCommons {
 
     private static final String PACKAGE_NAME = "me.colinpalombo.palombocommons";
 
-    private static Reflections REFLECTIONS;
-    private static ModuleManager MODULE_MANAGER;
+    private static Reflections reflections;
+    private static ModuleManager module_manager;
+
+    private static boolean initialized = false;
 
     public static void init(String packageName) {
         // Reflections
@@ -31,15 +35,22 @@ public class PalomboCommons {
             .filterInputsBy(new FilterBuilder().includePackage(PACKAGE_NAME))
             .setScanners(
                     new SubTypesScanner(false),
-                    new TypeAnnotationsScanner()
+                    new TypeAnnotationsScanner(),
+                    new FieldAnnotationsScanner(),
+                    new MethodAnnotationsScanner()
         );
 
         if (packageName != null && !packageName.isEmpty()) {
-            configurationBuilder.addUrls(ClasspathHelper.forPackage(packageName, classLoader));
+            classLoader = URLClassLoader.newInstance(new URL[]{}, ClasspathHelper.staticClassLoader());
+
+            configurationBuilder
+                    .addUrls(ClasspathHelper.forPackage(packageName, classLoader))
+                    .filterInputsBy(new FilterBuilder().includePackage(packageName));
         }
 
-        REFLECTIONS = new Reflections(configurationBuilder);
-        MODULE_MANAGER = new ModuleManager(REFLECTIONS);
+        reflections = new Reflections(configurationBuilder);
+        module_manager = new ModuleManager(reflections);
+        initialized = true;
     }
 
     public static void init() {
@@ -47,19 +58,19 @@ public class PalomboCommons {
     }
 
     public static Reflections getReflections() {
-        if (REFLECTIONS == null) {
+        if (!initialized) {
             init();
         }
 
-        return REFLECTIONS;
+        return reflections;
     }
 
     public static ModuleManager getModuleManager() {
-        if (REFLECTIONS == null) {
+        if (!initialized) {
             init();
         }
 
-        return MODULE_MANAGER;
+        return module_manager;
     }
 
     public static void log(String message, Object ... args) {

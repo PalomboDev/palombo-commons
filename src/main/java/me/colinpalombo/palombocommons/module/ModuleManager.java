@@ -17,7 +17,6 @@ public class ModuleManager {
 
     public ModuleManager(Reflections reflections) {
         for (Class<?> annotatedType : reflections.getTypesAnnotatedWith(RegisterModule.class)) {
-            System.out.println(annotatedType.getName());
             Class<? extends Module<?>> moduleClass = (Class<? extends Module<?>>) annotatedType;
 
             registerModule(moduleClass);
