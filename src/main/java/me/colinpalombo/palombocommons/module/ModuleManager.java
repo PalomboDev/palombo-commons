@@ -13,9 +13,14 @@ import java.util.Optional;
 public class ModuleManager {
 
     @Getter
+    private final Reflections reflections;
+
+    @Getter
     private final Map<String, Module<?>> modules = new HashMap<>();
 
     public ModuleManager(Reflections reflections) {
+        this.reflections = reflections;
+
         for (Class<?> annotatedType : reflections.getTypesAnnotatedWith(RegisterModule.class)) {
             Class<? extends Module<?>> moduleClass = (Class<? extends Module<?>>) annotatedType;
 

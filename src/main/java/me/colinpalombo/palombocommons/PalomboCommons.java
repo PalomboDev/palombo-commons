@@ -58,19 +58,23 @@ public class PalomboCommons {
     }
 
     public static Reflections getReflections() {
-        if (!initialized) {
-            init();
+        if (reflections == null) {
+            notInitialized();
         }
 
         return reflections;
     }
 
     public static ModuleManager getModuleManager() {
-        if (!initialized) {
-            init();
+        if (module_manager == null) {
+            notInitialized();
         }
 
         return module_manager;
+    }
+
+    private static void notInitialized() {
+        throw new RuntimeException("PalomboCommons has not been initialized correctly. Initialize with PalomboCommons#init");
     }
 
     public static void log(String message, Object ... args) {
